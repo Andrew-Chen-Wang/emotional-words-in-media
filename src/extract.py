@@ -25,16 +25,13 @@ def extract_youtube_videos(channels: Sequence, **kwargs):
             data = ydl.extract_info(url, download=False)
             channel = data["uploader_id"]
             path = BASE_DIR / "data" / "youtube" / f"{channel}.json"
-            if (
-                kwargs.get("save-as-json")
-                and (
-                    (path.is_file() and not kwargs.get("do-not-overwrite"))
-                    or not path.is_file()
-                )
+            if kwargs.get("save-as-json") and (
+                (path.is_file() and not kwargs.get("do-not-overwrite"))
+                or not path.is_file()
             ):
                 save_as_json(path, data)
             if kwargs.get("save-in-dolt"):
-                dolt = SaveItDolt(data)
+                dolt = SaveItDolt(data, kwargs.get("db_uri"), kwargs)
                 dolt.save_videos(use_ch_entry=False)
 
     if not kwargs.get("threaded"):
@@ -48,23 +45,23 @@ def extract_youtube_videos(channels: Sequence, **kwargs):
 
 class SaveItDolt:
     """Interface for saving records in Dolt with our specified methodology"""
+
     def __init__(
         self,
         data: dict = None,
-        user="root",
-        port=3306,
-        db="words_in_political_media",
+        db_uri="mysql+mysqlconnector://root@127.0.0.1:3306/words_in_political_media",
         main_kwargs=None,
+        *,
+        setup_dolt=True,
     ):
         self.data = data
-        self.engine = create_engine(
-            f"mysql+mysqlconnector://{user}@127.0.0.1:{port}/{db}"
-        )
+        self.engine = create_engine(db_uri)
         self.Session = sessionmaker(self.engine)
         if not main_kwargs:
             main_kwargs = {}
         self.kwargs = main_kwargs
-        self.setup_dolt()
+        if setup_dolt or self.kwargs.get("setup_dolt"):
+            self.setup_dolt()
         self.channel = None
 
     def setup_dolt(self):
@@ -91,14 +88,16 @@ class SaveItDolt:
         """Returns channel ID. If channel does not exist, create first."""
         session = self.Session()
         try:
-            self.channel = session.query(Channel).filter_by(
-                uploader_id=self.data["uploader_id"]
-            ).one()
+            self.channel = (
+                session.query(Channel)
+                .filter_by(uploader_id=self.data["uploader_id"])
+                .one()
+            )
         except NoResultFound:
             self.channel = Channel(
                 name=self.data["uploader"],
                 uploader_id=self.data["uploader_id"],
-                playlist_id=self.data["id"]
+                playlist_id=self.data["id"],
             )
             session.add(self.channel)
             session.commit()
@@ -115,7 +114,7 @@ class SaveItDolt:
 
         def create_video_kwargs(_entry: dict):
             # Many DB attributes are the same as the API returns
-            keys = ("title", "view_count", "dislike_count", "upload_date")
+            keys = ("title", "view_count", "dislike_count")
             return {key: _entry[key] for key in keys}
 
         videos = [
@@ -123,7 +122,7 @@ class SaveItDolt:
                 video_id=data["id"],
                 upload_date=datetime.strptime(data["upload_date"], "%Y%m%d"),
                 channel_id=data["uploader_id"] if use_ch_entry else self.channel.id,
-                *create_video_kwargs(data),
+                **create_video_kwargs(data),
             )
             for data in self.data["entries"]
         ]

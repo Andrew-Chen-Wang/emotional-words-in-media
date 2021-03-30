@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from . import BASE_DIR
 
+
 DATA_DIR = BASE_DIR / "data"
 if TYPE_CHECKING:
     from pathlib import Path

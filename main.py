@@ -38,14 +38,14 @@ def main():
         "--skip-extract",
         action="store_true",
         default=False,
-        help="Skip extracting information"
+        help="Skip extracting information",
     )
     parser.add_argument(
         "-t",
         "--threaded",
         action="store_true",
         default=False,
-        help="Execute program with multiple threads"
+        help="Execute program with multiple threads",
     )
     parser.add_argument(
         "--do-not-overwrite",
@@ -67,6 +67,11 @@ def main():
         action="store_true",
         default=False,
         help="Store the data as JSON",
+    )
+    parser.add_argument(
+        "--db_uri",
+        type=str,
+        help="A specific DB uri to use instead of the default Dolt version",
     )
     args = vars(parser.parse_args())
     if not args.get("save-as-json") and not args.get("save-in-dolt"):

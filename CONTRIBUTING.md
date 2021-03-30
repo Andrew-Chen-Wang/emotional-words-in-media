@@ -9,6 +9,13 @@ is licensed under CC0.
 To maintain compatibility, please respect the interface when updating data in Dolthub 
 using the src.extract class to do so.
 
+### Setting up
+
+1. `pip install -r requirements_dev.txt`
+2. To run the tests, run `pytest ./tests`
+3. Lint: `black main.py src/ tests/ && isort main.py src/ tests/ --lines-after-import 2 --profile black`
+4. Happy hacking! Eh hem, the politically correct word: "developing."
+
 ### Grabbing the correct playlist
 
 The correct playlist is a channel's "Uploads" playlist.

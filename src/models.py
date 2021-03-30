@@ -1,7 +1,8 @@
 from datetime import datetime
-from pytz import utc
 
+from pytz import utc
 from sqlalchemy import BigInteger, Column, Date, DateTime, ForeignKey, Integer, String
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -21,11 +22,25 @@ class Channel(Base):
     playlist_id = Column(String(200))
 
 
+class SLBigInteger(BigInteger):
+    pass
+
+
+@compiles(SLBigInteger, "sqlite")
+def bi_c(_element, _compiler, **_kw):
+    return "INTEGER"
+
+
+@compiles(SLBigInteger)
+def bi_c(element, compiler, **kw):
+    return compiler.visit_BIGINT(element, **kw)
+
+
 class Video(Base):
     __tablename__ = "video"
 
     # Meta
-    id = Column(BigInteger, autoincrement=True, primary_key=True)
+    id = Column(SLBigInteger, autoincrement=True, primary_key=True)
     record_created = Column(DateTime, default=utcnow)
     # Video
     video_id = Column(String(60))

@@ -3,7 +3,7 @@
 Amalgamation of data for knowing how many times Fox News (and of course everyone else 
 i.e. news outlets and media) says "SLAMS" (and other aggressive words). The point is to
 see if the words chosen affect the audience via view count and like:dislike ratio based
-on the current subscriber count and average viewership.
+on view count and average viewership for that channel.
 
 ---
 ### Usage
@@ -13,7 +13,7 @@ Uses Python 3.9. `pip install -r requirements.txt`. Run `python main.py`
 ---
 ### Contributing
 
-To contribute, please take a look at CONTRIBUTING.md.
+To contribute, please take a look at [CONTRIBUTING.md](https://github.com/Andrew-Chen-Wang/words-in-political-media/blob/main/CONTRIBUTING.md).
 
 ---
 ### FAQ
