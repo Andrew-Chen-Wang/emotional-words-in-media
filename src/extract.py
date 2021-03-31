@@ -25,12 +25,12 @@ def extract_youtube_videos(channels: Sequence, **kwargs):
             data = ydl.extract_info(url, download=False)
             channel = data["uploader_id"]
             path = BASE_DIR / "data" / "youtube" / f"{channel}.json"
-            if kwargs.get("save-as-json") and (
-                (path.is_file() and not kwargs.get("do-not-overwrite"))
+            if kwargs.get("save_as_json") and (
+                (path.is_file() and not kwargs.get("do_not_overwrite"))
                 or not path.is_file()
             ):
                 save_as_json(path, data)
-            if kwargs.get("save-in-dolt"):
+            if kwargs.get("save_in_dolt"):
                 dolt = SaveItDolt(data, kwargs.get("db_uri"), kwargs)
                 dolt.save_videos(use_ch_entry=False)
 
@@ -71,7 +71,7 @@ class SaveItDolt:
             print("OperationalError:", e)
             channel = self.data["uploader_id"]
             path = BASE_DIR / "data" / "youtube" / f"{channel}.json"
-            if not self.kwargs.get("save-as-json"):
+            if not self.kwargs.get("save_as_json"):
                 response = input("Do you want to save as JSON as backup? [Y/n]: ")
                 if (response.lower() or "y") == "y":
                     save_as_json(path, self.data)
@@ -134,6 +134,9 @@ class SaveItDolt:
                         **create_video_kwargs(data),
                     )
                 )
+            except Exception as e:
+                # Possibly due to privatized video
+                print(f"Code Error: {e}")
         session.commit()
 
     @classmethod

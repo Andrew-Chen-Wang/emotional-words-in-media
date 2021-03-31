@@ -74,10 +74,10 @@ def main():
         help="A specific DB uri to use instead of the default Dolt version",
     )
     args = vars(parser.parse_args())
-    if not args.get("save-as-json") and not args.get("save-in-dolt"):
+    if not args.get("save_as_json") and not args.get("save_in_dolt"):
         print("You must save either as  json or in Dolt.")
         quit(1)
-    if not args.get("skip-extract"):
+    if not args.get("skip_extract"):
         extract(args.get("extract"), **args)
 
 

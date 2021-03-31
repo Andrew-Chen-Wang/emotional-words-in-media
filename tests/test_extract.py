@@ -20,7 +20,7 @@ class TestExtract:
 
     @property
     def dk(self):
-        return {"save-in-dolt": True, "db_uri": get_db_uri(), "setup_dolt": False}
+        return {"save_in_dolt": True, "db_uri": get_db_uri(), "setup_dolt": False}
 
     def test_extract(self, session):
         extract_youtube_videos(self.channels, **self.dk)
