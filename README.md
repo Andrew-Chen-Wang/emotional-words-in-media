@@ -8,12 +8,23 @@ on view count and average viewership for that channel.
 ---
 ### Usage
 
-Uses Python 3.9. `pip install -r requirements.txt`. Run `python main.py`
+Uses Python 3.9. `pip install -r requirements.txt`.
+Run `python main.py --save-as-json`
+
+If you'd like to integrate with Dolt instead, you need to set up
+a dolt database which is possible with 
+`dolt clone andrew-chen-wang/words-in-political-media`. You can also
+simply create an empty dolt database by doing `dolt init`.
+
+Finally, run `python main.py --save-in-dolt`. You can save it as JSON
+at the same time with `python main.py --save-in-dolt --save-as-json`.
 
 ---
 ### Contributing
 
 To contribute, please take a look at [CONTRIBUTING.md](https://github.com/Andrew-Chen-Wang/words-in-political-media/blob/main/CONTRIBUTING.md).
+
+Data contributions are welcome well since the license for the data is CC0.
 
 ---
 ### FAQ

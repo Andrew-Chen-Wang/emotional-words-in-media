@@ -43,7 +43,7 @@ class Video(Base):
     id = Column(SLBigInteger, autoincrement=True, primary_key=True)
     record_created = Column(DateTime, default=utcnow)
     # Video
-    video_id = Column(String(60))
+    video_id = Column(String(60), unique=True, index=True)
     title = Column(String(100))
     # Because we use dolt, we'll know when an attribute is changed.
     # I wanted a JSON type but didn't want a separate table with an FK to here
@@ -54,3 +54,12 @@ class Video(Base):
     upload_date = Column(Date)
     last_known_privatized = Column(Date, nullable=True)
     channel_id = Column(Integer, ForeignKey("channel.id"))
+
+    @classmethod
+    def updatable_attributes(cls, include_privatized=False):
+        return [
+            "title",
+            "view_count",
+            "like_count",
+            "dislike_count",
+        ] + (["last_known_privatized"] if include_privatized else [])

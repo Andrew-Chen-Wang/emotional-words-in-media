@@ -117,19 +117,24 @@ class SaveItDolt:
             keys = ("title", "view_count", "dislike_count")
             return {key: _entry[key] for key in keys}
 
-        videos = [
-            Video(
-                video_id=data["id"],
-                upload_date=datetime.strptime(data["upload_date"], "%Y%m%d"),
-                channel_id=data["uploader_id"] if use_ch_entry else self.channel.id,
-                **create_video_kwargs(data),
-            )
-            for data in self.data["entries"]
-        ]
         session = self.Session()
-        session.add_all(videos)
+        for data in self.data["entries"]:
+            try:
+                old_vid = session.query(Video).filter_by(video_id=data["id"]).one()
+                for x in Video.updatable_attributes():
+                    setattr(old_vid, x, data[x])
+            except NoResultFound:
+                session.add(
+                    Video(
+                        video_id=data["id"],
+                        upload_date=datetime.strptime(data["upload_date"], "%Y%m%d"),
+                        channel_id=data["uploader_id"]
+                        if use_ch_entry
+                        else self.channel.id,
+                        **create_video_kwargs(data),
+                    )
+                )
         session.commit()
-        return videos
 
     @classmethod
     def save_json_in_dolt(cls, json_path: str):
