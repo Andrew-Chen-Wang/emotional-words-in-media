@@ -21,6 +21,7 @@ The tests run on SQLite first. If you'd like to test with Dolt though,
 you can also test by doing `python main.py --save-in-dolt`. You of course
 need the Dolt database though: `dolt clone andrew-chen-wang/words-in-political-media`,
 where `andrew-chen-wang` should be your fork if you'd like to contribute via data.
+Finally, you'll need to start the SQL server via `dolt sql-server`.
 
 ### Data contributions
 

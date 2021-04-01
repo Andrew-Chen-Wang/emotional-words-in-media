@@ -24,8 +24,6 @@ at the same time with `python main.py --save-in-dolt --save-as-json`.
 
 To contribute, please take a look at [CONTRIBUTING.md](https://github.com/Andrew-Chen-Wang/words-in-political-media/blob/main/CONTRIBUTING.md).
 
-Data contributions are welcome well since the license for the data is CC0.
-
 ---
 ### FAQ
 

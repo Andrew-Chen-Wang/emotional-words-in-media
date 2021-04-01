@@ -7,9 +7,6 @@ from src.models import Channel, Video
 from tests.utils import get_db_uri
 
 
-pytestmark = pytest.mark.db
-
-
 class TestExtract:
     # I would do extensive testing... but I'm so lazy I can't be bothered... it's alr :P
     @property
@@ -22,6 +19,7 @@ class TestExtract:
     def dk(self):
         return {"save_in_dolt": True, "db_uri": get_db_uri(), "setup_dolt": False}
 
+    @pytest.mark.sqlite_db
     def test_extract(self, session):
         extract_youtube_videos(self.channels, **self.dk)
         assert session.query(Channel).count() == 1
