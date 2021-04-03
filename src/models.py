@@ -17,7 +17,7 @@ class Channel(Base):
     __tablename__ = "channel"
 
     id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(String(60))
+    name = Column(String(200))
     uploader_id = Column(String(200), unique=True, index=True)
     playlist_id = Column(String(200))
 
@@ -44,7 +44,7 @@ class Video(Base):
     record_created = Column(DateTime, default=utcnow)
     # Video
     video_id = Column(String(60), unique=True, index=True)
-    title = Column(String(100))
+    title = Column(String(255))
     # Because we use dolt, we'll know when an attribute is changed.
     # I wanted a JSON type but didn't want a separate table with an FK to here
     # just for a changelog. Maybe if someone takes maintainership they can do it

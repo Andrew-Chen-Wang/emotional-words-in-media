@@ -27,10 +27,30 @@ To contribute, please take a look at [CONTRIBUTING.md](https://github.com/Andrew
 ---
 ### FAQ
 
-> Is the project complete?
+> Why only these channels?
 
-No. I still need to actually download the JSON for these
-channels and make visuals for them so people are interested.
+There's more to come! But the main focus was mainstream media outlets.
+Then we can get more like TheYoungTurks or Ben Shapiro show or Vox or Vice
+or Buzzfeed News. Like there is plenty of competition in this field, and
+those are just the ones I'm aware of. But the main point was to look at
+the ones that have been around for decades.
+
+I added The Hill, even though it is not as popular as the Initial (CNN,
+ABC, NBC, Fox, MSNBC), as a balancing force in the 2D political balance
+beam. Though as of 2 April 2021, I'm unsure if it'll be in the final
+visuals/graphs. If anything, I'm only speaking of the database itself
+and not the final outcome (for logging purposes).
+
+There's also international ones like the BBC or CBC (I think) or Sky
+News Australia which intriguingly talks a lot about America for being
+Australian... anyways. Those can be included when I don't want to have
+a VPN turned on and 13 GB of memory out of my 16 used up. Additionally,
+I'll probably have space on my RPi 3 to download some more, so let
+me know in the GitHub or Dolthub repositories and I'll download it!
+Those currently aren't included simply because this project is American
+focused. If I were to include international media, where standards and
+even the cultures (e.g. the American v.s. British) are different, I feel
+there would be too much bias in the final calculations.
 
 > Why did you make this?
 
@@ -53,6 +73,27 @@ Ok but if I'm being honest, I just wanted a place to store my data.
 Additionally, they didn't have JSON types yet for their database; otherwise,
 I would've made some `extra` JSON type attribute for transferring sake.
 
+> Why are some videos missing? Why not a perfectly 20,000 video set per channel?
+
+Initially, all Uploads playlists have 20,000 ish-but-max videos. There are some
+privatized videos too. Other times, my internet just dropped, and I honestly couldn't
+bother trying to get the lost 20 videos.
+
+> What did you learn from this?
+
+I'm never using SQLAlchemy again. The downloading portion is just way too unstable
+for me. Either I'm doing something wrong, because I keep getting an "ObjectDeletedError"
+for a missing channel that's obviously not missing because it was just created and
+saved... or uh I'm blaming Dolt or SQLAlchemy... Idek anymore.
+
+The SQLAlchemy Python file (i.e. src/extract.py) might just be broken.
+I would highly recommend saving as json (which will happen before saving
+to Dolt) in addition to saving to Dolt because I have no idea when, where,
+and why Dolt fails sometimes. The JSON files are about 4GB large for a channel
+with ~20,000 videos. If Dolt does fail, then in src/extract.py, there's 
+a helper method in `SaveItDolt` where you can save to Dolt via a JSON file
+given a string path.
+
 ---
 ### License and Credit
 
@@ -74,3 +115,9 @@ Date: March 4, 2021
 
 I've had this idea for a while, but I never got around to doing it.
 So here goes nothing...
+
+Credit goes to ProtonVPN and the Proton Team. Without their
+VPN, and no this isn't sponsored, I would totally get throttled by YouTube
+and never be able to experience it again in the name of science.
+(man I love such cliche quotes)... And without the YouTube-DL team, 
+this project would not be possible. Thank you all and sponsor them please!

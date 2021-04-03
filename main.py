@@ -21,6 +21,8 @@ def extract(given_list: list, **kwargs):
             "https://www.youtube.com/playlist?list=UUeY0bbntWzzVIaj2z3QigXg",  # NBC
             # American/Me-Perspective Conservative honestly depressing having just one:(
             "https://www.youtube.com/playlist?list=UUXIJgqnII2ZOINSWNOGFThA",  # FOX
+            # Hey! Found another one! Although definitely a newcomer
+            "https://www.youtube.com/playlist?list=UUPWXiRWZ29zrxPFIQT7eHSA",
         ]
     extract_youtube_videos(given_list, **kwargs)
 

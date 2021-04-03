@@ -30,6 +30,7 @@ def extract_youtube_videos(channels: Sequence, **kwargs):
             raise ValueError("Couldn't download data from YouTube.")
         channel = data["uploader_id"]
         path = BASE_DIR / "data" / "youtube" / f"{channel}.json"
+        print(f"Saving file {channel}.json for {data['uploader']}")
         if kwargs.get("save_as_json") and (
             (path.is_file() and not kwargs.get("do_not_overwrite"))
             or not path.is_file()
@@ -71,11 +72,13 @@ class SaveItDolt:
 
     def __enter__(self):
         self.engine = create_engine(self._db_uri or DEF_DB_URI)
-        self.Session = scoped_session(sessionmaker(self.engine))
+        self.pool = scoped_session(sessionmaker(self.engine))
+        self.session = self.pool()
         if self._setup_dolt or self.kwargs.get("setup_dolt"):
             self.setup_dolt()
+        return self.session
 
-    def __exit__(self, *args, **kwargs):
+    def __exit__(self, exc_type, exc_value, traceback):
         self.engine.dispose()
 
     def setup_dolt(self):
@@ -84,6 +87,7 @@ class SaveItDolt:
         except (DatabaseError, OperationalError) as e:
             print("Database/Operational Error:", e)
             channel = self.data["uploader_id"]
+            print(f"Saving file {channel}.json for {self.data['uploader']}")
             path = BASE_DIR / "data" / "youtube" / f"{channel}.json"
             if not self.kwargs.get("save_as_json"):
                 if self.kwargs.get("threaded"):
@@ -105,21 +109,21 @@ class SaveItDolt:
     def get_or_save_channel(self) -> Channel:
         """Returns channel ID. If channel does not exist, create first."""
         print(f"Getting Existing/Saving new channel: {self.data['uploader']}")
-        session = self.Session()
         try:
             self.channel = (
-                session.query(Channel)
+                self.session.query(Channel)
                 .filter_by(uploader_id=self.data["uploader_id"])
                 .one()
             )
         except NoResultFound:
-            self.channel = Channel(
+            channel = Channel(
                 name=self.data["uploader"],
                 uploader_id=self.data["uploader_id"],
                 playlist_id=self.data["id"],
             )
-            session.add(self.channel)
-            session.commit()
+            self.session.add(channel)
+            self.session.commit()
+            self.channel = channel
         return self.channel
 
     def save_videos(self, *, use_ch_entry: bool = False):
@@ -131,34 +135,51 @@ class SaveItDolt:
         if not self.channel and not use_ch_entry:
             self.get_or_save_channel()
 
-        def create_video_kwargs(_entry: dict):
-            # Many DB attributes are the same as the API returns
-            keys = ("title", "view_count", "dislike_count")
-            return {key: _entry[key] for key in keys}
-
-        print(f"Saving/updating videos for: {self.data['uploader']}")
-        session = self.Session()
-        for data in self.data["entries"]:
+        print(f"Updating videos for: {self.data['uploader']}")
+        all_ids = {}
+        for x in self.data["entries"]:
             try:
-                old_vid = session.query(Video).filter_by(video_id=data["id"]).one()
-                for x in Video.updatable_attributes():
-                    setattr(old_vid, x, data[x])
-                session.add(old_vid)
-            except NoResultFound:
-                session.add(
+                all_ids[x["id"]] = {
+                    k: x.get(k, 0) for k in Video.updatable_attributes()
+                }
+            except AttributeError:
+                # Sometimes it's just None... maybe because it's private?
+                pass
+        # FIXME Exponential growth in IN clause correlated to number of items.
+        #  If you have a new channel, comment out all until
+        #  L160 i.e. self.session.commit() and L167's instructions.
+        #  Remove comment when this is resolved:
+        #  https://github.com/dolthub/dolt/issues/1511
+        old_videos = self.session.query(Video).filter(
+            Video.video_id.in_(list(all_ids.keys()))
+        ).all()
+        for vid in old_videos:
+            # Find the entry
+            entry = all_ids[vid.video_id]
+            for x in Video.updatable_attributes():
+                setattr(vid, x, entry[x])
+            self.session.add(vid)
+        self.session.commit()
+
+        print(f"Saving new videos for: {self.data['uploader']}")
+        needed = set(all_ids.keys()).difference([vid.video_id for vid in old_videos])
+        for data in self.data["entries"]:
+            # TODO Above instructions: replace needed with all_ids.keys()
+            if data is None or data.get("id") not in needed:
+                continue
+            try:
+                self.session.add(
                     Video(
                         video_id=data["id"],
                         upload_date=datetime.strptime(data["upload_date"], "%Y%m%d"),
-                        channel_id=data["uploader_id"]
-                        if use_ch_entry
-                        else self.channel.id,
-                        **create_video_kwargs(data),
+                        channel_id=self.channel.id,
+                        **{k: data.get(k, 0) for k in Video.updatable_attributes()},
                     )
                 )
             except Exception as e:
                 # Possibly due to privatized video
                 print(f"Code Error: {e}")
-        session.commit()
+        self.session.commit()
 
     @classmethod
     def save_json_in_dolt(cls, json_path: str):
@@ -169,4 +190,5 @@ class SaveItDolt:
         with open(json_path) as fp:
             data = json.load(fp)
         dope = cls(data)
-        dope.save_videos(use_ch_entry=False)
+        with dope:
+            dope.save_videos(use_ch_entry=False)
