@@ -123,6 +123,11 @@ class SaveItDolt:
             )
             self.session.add(channel)
             self.session.commit()
+            from time import sleep
+
+            sleep(2)
+            # I'm not sure if this will help. For some reason, after committing,
+            # the record is still not updated with an ID here.
             self.channel = channel
         return self.channel
 
@@ -137,22 +142,33 @@ class SaveItDolt:
 
         print(f"Updating videos for: {self.data['uploader']}")
         all_ids = {}
-        for x in self.data["entries"]:
-            try:
-                all_ids[x["id"]] = {
-                    k: x.get(k, 0) for k in Video.updatable_attributes()
-                }
-            except AttributeError:
-                # Sometimes it's just None... maybe because it's private?
-                pass
+
+        def loop_entries(entries):
+            for _entry in entries:
+                if "entries" in _entry:
+                    # Sometimes it's got multiple videos embedded in a single entry
+                    loop_entries(_entry["entries"])
+                    continue
+                try:
+                    all_ids[_entry["id"]] = {
+                        k: _entry.get(k, 0) for k in Video.updatable_attributes()
+                    }
+                except AttributeError:
+                    # Sometimes it's just None... maybe because it's private?
+                    continue
+
+        loop_entries(self.data["entries"])
+
         # FIXME Exponential growth in IN clause correlated to number of items.
         #  If you have a new channel, comment out all until
         #  L160 i.e. self.session.commit() and L167's instructions.
         #  Remove comment when this is resolved:
         #  https://github.com/dolthub/dolt/issues/1511
-        old_videos = self.session.query(Video).filter(
-            Video.video_id.in_(list(all_ids.keys()))
-        ).all()
+        old_videos = (
+            self.session.query(Video)
+            .filter(Video.video_id.in_(list(all_ids.keys())))
+            .all()
+        )
         for vid in old_videos:
             # Find the entry
             entry = all_ids[vid.video_id]

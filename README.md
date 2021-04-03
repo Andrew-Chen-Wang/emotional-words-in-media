@@ -8,13 +8,18 @@ on view count and average viewership for that channel.
 ---
 ### Usage
 
-Uses Python 3.9. `pip install -r requirements.txt`.
-Run `python main.py --save-as-json`
+To only grab the data, use Dolt: `dolt clone andrew-chen-wang/words-in-political-media`
 
-If you'd like to integrate with Dolt instead, you need to set up
-a dolt database which is possible with 
-`dolt clone andrew-chen-wang/words-in-political-media`. You can also
-simply create an empty dolt database by doing `dolt init`.
+Otherwise, to manually grab new data from YouTube directly with JSON,
+(I'm using Python 3.9) run
+`pip install -r requirements.txt && python main.py --save-as-json`.
+I highly recommend you use a VPN; otherwise, YouTube will throttle you
+when you actually want to watch YouTube videos. I highly recommend
+you support ProtonVPN, the creators of ProtonMail.
+
+If you'd like to integrate with Dolt instead, you can
+simply create an empty dolt database by doing `dolt init`. Note:
+I changed the main branch from `master` to `main` on Dolt.
 
 Finally, run `python main.py --save-in-dolt`. You can save it as JSON
 at the same time with `python main.py --save-in-dolt --save-as-json`.
@@ -26,31 +31,6 @@ To contribute, please take a look at [CONTRIBUTING.md](https://github.com/Andrew
 
 ---
 ### FAQ
-
-> Why only these channels?
-
-There's more to come! But the main focus was mainstream media outlets.
-Then we can get more like TheYoungTurks or Ben Shapiro show or Vox or Vice
-or Buzzfeed News. Like there is plenty of competition in this field, and
-those are just the ones I'm aware of. But the main point was to look at
-the ones that have been around for decades.
-
-I added The Hill, even though it is not as popular as the Initial (CNN,
-ABC, NBC, Fox, MSNBC), as a balancing force in the 2D political balance
-beam. Though as of 2 April 2021, I'm unsure if it'll be in the final
-visuals/graphs. If anything, I'm only speaking of the database itself
-and not the final outcome (for logging purposes).
-
-There's also international ones like the BBC or CBC (I think) or Sky
-News Australia which intriguingly talks a lot about America for being
-Australian... anyways. Those can be included when I don't want to have
-a VPN turned on and 13 GB of memory out of my 16 used up. Additionally,
-I'll probably have space on my RPi 3 to download some more, so let
-me know in the GitHub or Dolthub repositories and I'll download it!
-Those currently aren't included simply because this project is American
-focused. If I were to include international media, where standards and
-even the cultures (e.g. the American v.s. British) are different, I feel
-there would be too much bias in the final calculations.
 
 > Why did you make this?
 
@@ -79,20 +59,9 @@ Initially, all Uploads playlists have 20,000 ish-but-max videos. There are some
 privatized videos too. Other times, my internet just dropped, and I honestly couldn't
 bother trying to get the lost 20 videos.
 
-> What did you learn from this?
+> Dolt is taking up too much space. How do I get rid of it?
 
-I'm never using SQLAlchemy again. The downloading portion is just way too unstable
-for me. Either I'm doing something wrong, because I keep getting an "ObjectDeletedError"
-for a missing channel that's obviously not missing because it was just created and
-saved... or uh I'm blaming Dolt or SQLAlchemy... Idek anymore.
-
-The SQLAlchemy Python file (i.e. src/extract.py) might just be broken.
-I would highly recommend saving as json (which will happen before saving
-to Dolt) in addition to saving to Dolt because I have no idea when, where,
-and why Dolt fails sometimes. The JSON files are about 4GB large for a channel
-with ~20,000 videos. If Dolt does fail, then in src/extract.py, there's 
-a helper method in `SaveItDolt` where you can save to Dolt via a JSON file
-given a string path.
+Run `dolt gc` in the root of your repository. Noms takes up a lot of space.
 
 ---
 ### License and Credit
@@ -117,7 +86,7 @@ I've had this idea for a while, but I never got around to doing it.
 So here goes nothing...
 
 Credit goes to ProtonVPN and the Proton Team. Without their
-VPN, and no this isn't sponsored, I would totally get throttled by YouTube
+VPN, and, no, this isn't sponsored, I would totally get throttled by YouTube
 and never be able to experience it again in the name of science.
-(man I love such cliche quotes)... And without the YouTube-DL team, 
+(man I love such cliché quotes)... Without the YouTube-DL team, 
 this project would not be possible. Thank you all and sponsor them please!

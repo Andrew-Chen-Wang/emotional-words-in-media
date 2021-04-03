@@ -21,8 +21,17 @@ def extract(given_list: list, **kwargs):
             "https://www.youtube.com/playlist?list=UUeY0bbntWzzVIaj2z3QigXg",  # NBC
             # American/Me-Perspective Conservative honestly depressing having just one:(
             "https://www.youtube.com/playlist?list=UUXIJgqnII2ZOINSWNOGFThA",  # FOX
+            # I changed my mind. I wanna go big and that means more channels
+            # None of these will end up in the graphs though
             # Hey! Found another one! Although definitely a newcomer
-            "https://www.youtube.com/playlist?list=UUPWXiRWZ29zrxPFIQT7eHSA",
+            "https://www.youtube.com/playlist?list=UUPWXiRWZ29zrxPFIQT7eHSA",  # The Hill
+            "https://www.youtube.com/playlist?list=UU1yBKRuGpC1tSM73A0ZjYjQ",  # The Young Turks
+            # "https://www.youtube.com/playlist?list=UULXo7UDZvByw2ixzpQCufnA",  # Vox
+            "https://www.youtube.com/playlist?list=UUZaT_X_mc0BI-djXOlfhqWQ",  # Vice NEWS
+            # "https://www.youtube.com/playlist?list=UUO0akufu9MOzyz3nvGIXAAw",  # Sky News Australia
+            # "https://www.youtube.com/playlist?list=UU16niRr50-MSBwiO3YDb3RA",  # BBC
+            "https://www.youtube.com/playlist?list=UUhqUTb7kYRX8-EiaN3XFrSQ",  # Reuters
+            # "https://www.youtube.com/playlist?list=UU4SUWizzKc1tptprBkWjX2Q",  # South CHHIIINA Morning Post
         ]
     extract_youtube_videos(given_list, **kwargs)
 
